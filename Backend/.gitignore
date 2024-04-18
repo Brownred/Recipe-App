@@ -1,2 +1,5 @@
 notes.md
 node_modules/
+.env
+prisma/
+.gitignore
