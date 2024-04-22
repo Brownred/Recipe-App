@@ -1,5 +1,13 @@
 
-export const searchRecipes = async (searchTerm: string, page: number) => {
+/**
+ * Searches for recipes based on the provided search term and page number.
+ * @param searchTerm - The term to search for recipes.
+ * @param page - The page number of the search results.
+ * @returns A Promise that resolves to the search results in JSON format.
+ * @throws An error if the API key is not found.
+ */
+
+const searchRecipes = async (searchTerm: string, page: number) => {
     const apiKey = process.env.API_KEY;
     
     if (!apiKey) {
@@ -28,3 +36,4 @@ export const searchRecipes = async (searchTerm: string, page: number) => {
 };
 
 export default searchRecipes;
+
