@@ -53,5 +53,5 @@ const getRecipeSummary = async (id: string) => {
     return json;
 };
 
-export default searchRecipes;
+export { searchRecipes, getRecipeSummary };
 
