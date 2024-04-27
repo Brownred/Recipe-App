@@ -7,9 +7,10 @@
  * @throws An error if the API key is not found.
  */
 
+const apiKey = process.env.API_KEY;
+
 const searchRecipes = async (searchTerm: string, page: number) => {
-    const apiKey = process.env.API_KEY;
-    
+        
     if (!apiKey) {
         throw new Error('API key not found');
     }
@@ -21,7 +22,7 @@ const searchRecipes = async (searchTerm: string, page: number) => {
         apiKey: apiKey,
         query: searchTerm,
         number: "10", // howmany messages we want to get per request
-        offset: ((page - 1) * 10).toString(), // this is how we can get the next page of 
+        offset: (page * 10).toString(), // this is how we can get the next page of 
     };
     url.search = new URLSearchParams(queryParams).toString(); // this will convert the query params into a string that can be appended to the url
 
@@ -33,6 +34,23 @@ const searchRecipes = async (searchTerm: string, page: number) => {
         console.error('Error fetching recipes', error);
         return null;
     }
+};
+
+const getRecipeSummary = async (id: string) => {
+    
+    if (!apiKey) {
+        throw new Error('API key not found');
+    }
+
+    const url = new URL(`https://api.spoonacular.com/recipes/${id}/summary`);
+    const params = {
+        apiKey: apiKey
+    };
+    url.search = new URLSearchParams(params).toString();
+    
+    const response = await fetch(url);
+    const json = await response.json(); 
+    return json;
 };
 
 export default searchRecipes;
