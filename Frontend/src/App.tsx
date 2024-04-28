@@ -1,6 +1,6 @@
 import "./App.css";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { searchRecipes } from "./api";
+import { getFavoriteRecipes, searchRecipes, addFavouriteRecipe } from "./api";
 import { Recipe } from "./types";
 import RecipeCard from "./components/RecipeCard";
 import RecipeModal from "./components/recipeModal";
@@ -13,6 +13,7 @@ function App() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [selectedTab, setSelectedTab] = useState<Tabs>("search");
+  const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
 
   const pageNumber = useRef(1);
 
@@ -20,6 +21,7 @@ function App() {
     const fetchFavoriteRecipes = async () => {
       try {
         const favoriteRecipes = await getFavoriteRecipes();
+        setFavoriteRecipes(favoriteRecipes.results);
       } catch(e) {
         console.log(e);
       }
@@ -50,6 +52,15 @@ function App() {
     }
   };
 
+  const addFavoriteRecipe = async (recipe: Recipe) => {
+    try {
+      await addFavouriteRecipe(recipe);
+      setFavoriteRecipes([...favoriteRecipes, recipe]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
       <div className="">
         <div className="tabs">
@@ -71,7 +82,10 @@ function App() {
         </form>
 
         {recipes.map((recipe) => (
-          <RecipeCard recipe={recipe} onClick={() => setSelectedRecipe(recipe)} />
+          <RecipeCard recipe={recipe}
+          onClick={() => setSelectedRecipe(recipe)}
+          onFavBtnClick={() => addFavoriteRecipe(recipe)}
+          />
         ))}
         <button
           className="view-more-button"
@@ -81,8 +95,11 @@ function App() {
         </>)} 
 
       {selectedTab === "favorites" && (<>
-        <h1>Favourites</h1>
-        <p>Coming soon...</p>
+        {favoriteRecipes.map((recipe)=> (
+          <RecipeCard recipe={recipe}
+          onClick={()=> setSelectedRecipe(recipe)}
+          onFavBtnClick={()=> undefined}/>
+        ))}
       </>)}
 
         {selectedRecipe ? (
