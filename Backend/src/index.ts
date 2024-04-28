@@ -4,11 +4,14 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config() // this will read the .env file and make the key value pairs available as environment variables
-import { searchRecipes, getRecipeSummary } from './recipe-api'
+import { searchRecipes, getRecipeSummary, getFavouriteRecipeByIds } from './recipe-api'
+import { PrismaClient } from '@prisma/client'
 
 
 // create a new express app
 const app = express(); // this is the app that we will use to create our server. an analogy is that it is like a factory that creates a car
+
+const prismaClient = new PrismaClient(); // this is the prisma client that we will use to interact with our database. an analogy is that it is like a key that we will use to open the door to our database
 
 app.use(express.json()); // a convinience thing that helps us convert the body of the request that we make into json so that we dont have to do it manually on every request. an analogy is that it is like a translator that translates the language of the request and into json
 app.use(cors()); // this is a middleware that allows us to make requests from our frontend to our backend. an analogy is that it is like a bouncer at a club that allows people in.
@@ -31,6 +34,46 @@ app.get("/api/recipes/:id/summary", async (req, res) => {
     const results = await getRecipeSummary(recipeId);
     return res.json(results);
 })
+
+app.post("/api/recipes/favourites", async (req, res) => {
+    const recipeId = req.body.recipeId as string;
+
+    try {
+        const favouriteRecipe = await prismaClient.favouriteRecipes.create({
+            data: {
+                recipeId: recipeId
+            }
+        });
+        return res.status(201).json(favouriteRecipe);
+    } catch (error) {
+        console.log("Error is: " + error);
+        return res.status(500).json({ error: "An error occurred while saving the recipe to your favourites" });
+    }
+});
+
+app.get("/api/recipes/favourites", async (req, res) => {
+    const recipes = await prismaClient.favouriteRecipes.findMany();
+    const recipeIds = recipes.map((recipe)=> recipe.recipeId);
+    
+    const favourites = await getFavouriteRecipeByIds(recipeIds);
+
+    return res.json(favourites)
+});
+
+app.delete("/api/recipes/favourites", async(req, res) => {
+    const recipeId = req.body.recipeId;
+    
+    try {
+        await prismaClient.favouriteRecipes.delete({
+            where:{
+                recipeId: recipeId
+            }
+        })
+        return res.status(204).send()
+    } catch (error) {
+        console.log("Error is: " + error);
+        return res.status(500).json({ error: "An error occurred while deletinfthe recipe to your favourites"});
+}});
 
 app.listen(4000, () => {
     console.log("Server is running on localhost:4000"); // this is the code that will run when the server/ code is succesfully started. 
