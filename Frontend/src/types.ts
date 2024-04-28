@@ -4,3 +4,9 @@ export interface Recipe {
     image: string;
     imageType: string;
 }
+
+export interface RecipeSummary {
+    id: string;
+    title: string;
+    summary: string;
+}

@@ -1,14 +1,17 @@
 import "./App.css";
 import { FormEvent, useRef, useState } from "react";
-import searchRecipes from "./api";
+import { searchRecipes } from "./api";
 import { Recipe } from "./types";
 import RecipeCard from "./components/RecipeCard";
+import RecipeModal from "./components/recipeModal";
 
 
 function App() {
 
   const [searchTerm, setSearchTerm] = useState<string>("fries");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+
   const pageNumber = useRef(1);
 
   const handleSearchSubmit = async (event: FormEvent) => {
@@ -48,13 +51,17 @@ function App() {
         </form>
         
         {recipes.map((recipe) => (
-          <RecipeCard recipe={recipe}/>
+          <RecipeCard recipe={recipe} onClick={()=> setSelectedRecipe(recipe)}/>
         ))}
         <button 
           className="view-more-button"
           onClick={handleViewMoreCllick}>
           view more
         </button> 
+
+        {selectedRecipe ? (
+        <RecipeModal id={selectedRecipe.id} onClose={()=> setSelectedRecipe(null)}/>
+        ) : null} 
 
       </div>
   )
