@@ -7,7 +7,7 @@ interface Props {
 
 const RecipeCard = ({recipe}: Props) => {
     return (
-        <div className="recipe-card">
+        <div className="recipe-card" key={recipe.id}>
             <img src={recipe.image} alt=""/>
             <div className="recipe-card-title">
                 <h3>{recipe.title}</h3>
