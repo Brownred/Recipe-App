@@ -1,6 +1,6 @@
 import "./App.css";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { getFavoriteRecipes, searchRecipes, addFavouriteRecipe } from "./api";
+import { getFavoriteRecipes, searchRecipes, addFavouriteRecipe, removeFavouriteRecipe } from "./api";
 import { Recipe } from "./types";
 import RecipeCard from "./components/RecipeCard";
 import RecipeModal from "./components/recipeModal";
@@ -52,6 +52,16 @@ function App() {
     }
   };
 
+  const removeFavoriteRecipe = async(recipe: Recipe) => {
+    try {
+      await removeFavouriteRecipe(recipe);
+      const updateRecipes = favoriteRecipes.filter((favRecipe) => recipe.id !== favRecipe.id);
+      setFavoriteRecipes(updateRecipes);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const addFavoriteRecipe = async (recipe: Recipe) => {
     try {
       await addFavouriteRecipe(recipe);
@@ -59,7 +69,7 @@ function App() {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
       <div className="">
@@ -81,12 +91,16 @@ function App() {
           </button>
         </form>
 
-        {recipes.map((recipe) => (
+        {recipes.map((recipe) => {
+          const isFavourite = favoriteRecipes.some((favRecipe)=> recipe.id === favRecipe.id);
+        return(
           <RecipeCard recipe={recipe}
           onClick={() => setSelectedRecipe(recipe)}
-          onFavBtnClick={() => addFavoriteRecipe(recipe)}
+          onFavBtnClick={isFavourite ? removeFavoriteRecipe : addFavoriteRecipe }
+          isFavourite = {isFavourite}
           />
-        ))}
+        );
+        })}
         <button
           className="view-more-button"
           onClick={handleViewMoreCllick}>
@@ -98,7 +112,9 @@ function App() {
         {favoriteRecipes.map((recipe)=> (
           <RecipeCard recipe={recipe}
           onClick={()=> setSelectedRecipe(recipe)}
-          onFavBtnClick={()=> undefined}/>
+          onFavBtnClick={removeFavoriteRecipe} 
+          isFavourite={true}
+          />
         ))}
       </>)}
 

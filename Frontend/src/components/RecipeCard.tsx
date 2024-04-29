@@ -8,16 +8,17 @@
  */
 
 import {Recipe} from "../types"
-import {AiOutlineHeart} from "react-icons/ai"
+import {AiFillHeart, AiOutlineHeart} from "react-icons/ai"
 
 
 interface Props {
     recipe: Recipe;
+    isFavourite: boolean;
     onClick: () => void; // the on click prop that is passed to the recipe card has to accept a recipe as an argument and return nothing
     onFavBtnClick: (recipe: Recipe) => void;
 }
 
-const RecipeCard = ({recipe, onClick, onFavBtnClick}: Props) => {
+const RecipeCard = ({recipe, onClick, onFavBtnClick, isFavourite}: Props) => {
     return (
         <div className="recipe-card" key={recipe.id} onClick={onClick}>
             <img src={recipe.image} alt=""/>
@@ -26,7 +27,8 @@ const RecipeCard = ({recipe, onClick, onFavBtnClick}: Props) => {
                     event.stopPropagation()
                     onFavBtnClick(recipe)
                 }}>
-                    <AiOutlineHeart size={26} />
+                    {isFavourite ? <AiFillHeart size={25} color="red" /> : <AiOutlineHeart size={26} />}
+                    
                 </span>
                 <h3>{recipe.title}</h3>
                 <h4>{recipe.id}</h4>
